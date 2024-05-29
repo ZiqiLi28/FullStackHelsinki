@@ -1,1 +1,1 @@
-# Full Stack Course from University of Helsinki1
+# Full Stack Course from University of Helsinki
