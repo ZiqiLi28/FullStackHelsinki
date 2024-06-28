@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 
-// Button 组件定义
 const Button = ({ handleClick, text }) => (
   <button onClick={handleClick}>{text}</button>
 );
 
-// StatisticLine 组件定义
 const StatisticLine = ({ text, value }) => (
   <tr>
     <td>{text}</td>
@@ -13,7 +11,6 @@ const StatisticLine = ({ text, value }) => (
   </tr>
 );
 
-// Statistics 组件定义
 const Statistics = ({ good, neutral, bad }) => {
   const all = good + neutral + bad;
   const average = all === 0 ? 0 : (good - bad) / all;
