@@ -5,7 +5,7 @@ const PORT = 3001;
 
 app.use(express.json()); // 解析 JSON 请求体
 
-// 配置 morgan 中间件
+// 配置 morgan 中间件，添加自定义 token 记录请求体数据
 morgan.token('body', (req) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
