@@ -1,11 +1,12 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 const app = express();
 const PORT = 3001;
 
-app.use(express.json()); // 解析 JSON 请求体
+app.use(express.json());
+app.use(cors());
 
-// 配置 morgan 中间件，添加自定义 token 记录请求体数据
 morgan.token('body', (req) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
@@ -88,6 +89,23 @@ app.post('/api/persons', (req, res) => {
   persons = persons.concat(newPerson);
 
   res.json(newPerson);
+});
+
+app.put('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const body = req.body;
+
+  const person = persons.find(person => person.id === id);
+
+  if (!person) {
+    return res.status(404).json({ error: 'Person not found' });
+  }
+
+  const updatedPerson = { ...person, number: body.number };
+
+  persons = persons.map(p => p.id !== id ? p : updatedPerson);
+
+  res.json(updatedPerson);
 });
 
 app.listen(PORT, () => {
