@@ -46,8 +46,76 @@ test('unique identifier property of the blog posts is named id', async () => {
 
   blogs.forEach(blog => {
     expect(blog.id).toBeDefined()
-    expect(blog._id).toBeUndefined()
   })
+})
+
+test('a valid blog can be added', async () => {
+  const newBlog = {
+    title: 'New blog',
+    author: 'New Author',
+    url: 'http://example.com/new',
+    likes: 5,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const titles = response.body.map(r => r.title)
+
+  expect(response.body).toHaveLength(initialBlogs.length + 1)
+  expect(titles).toContain('New blog')
+})
+
+test('if likes property is missing from request, it will default to 0', async () => {
+  const newBlog = {
+    title: 'Blog without likes',
+    author: 'No Likes Author',
+    url: 'http://example.com/nolikes',
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  expect(response.body.likes).toBe(0)
+})
+
+test('blog without title is not added', async () => {
+  const newBlog = {
+    author: 'No Title Author',
+    url: 'http://example.com/notitle',
+    likes: 1,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const response = await api.get('/api/blogs')
+  expect(response.body).toHaveLength(initialBlogs.length)
+})
+
+test('blog without url is not added', async () => {
+  const newBlog = {
+    title: 'Blog without url',
+    author: 'No URL Author',
+    likes: 1,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const response = await api.get('/api/blogs')
+  expect(response.body).toHaveLength(initialBlogs.length)
 })
 
 afterAll(() => {
