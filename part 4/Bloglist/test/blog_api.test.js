@@ -118,6 +118,43 @@ test('blog without url is not added', async () => {
   expect(response.body).toHaveLength(initialBlogs.length)
 })
 
+test('a blog can be deleted', async () => {
+  const response = await api.get('/api/blogs')
+  const blogToDelete = response.body[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const responseAfterDeletion = await api.get('/api/blogs')
+  expect(responseAfterDeletion.body).toHaveLength(initialBlogs.length - 1)
+})
+
+test('a blog can be updated', async () => {
+  const response = await api.get('/api/blogs')
+  const blogToUpdate = response.body[0]
+
+  const updatedBlog = {
+    title: 'Updated blog',
+    author: 'Updated Author',
+    url: 'http://example.com/updated',
+    likes: 10,
+  }
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+    .expect(200)
+
+  const responseAfterUpdate = await api.get('/api/blogs')
+  const updatedBlogFromResponse = responseAfterUpdate.body.find(blog => blog.id === blogToUpdate.id)
+
+  expect(updatedBlogFromResponse.title).toBe(updatedBlog.title)
+  expect(updatedBlogFromResponse.author).toBe(updatedBlog.author)
+  expect(updatedBlogFromResponse.url).toBe(updatedBlog.url)
+  expect(updatedBlogFromResponse.likes).toBe(updatedBlog.likes)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
