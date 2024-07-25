@@ -14,6 +14,9 @@ beforeEach(async () => {
 
   const passwordHash = await bcrypt.hash('sekret', 10)
   const user = new User({ username: 'root', passwordHash })
+  const userObjects = helper.initialUsers.map(user => new User(user))
+  const promiseArray = userObjects.map(user => user.save())
+  await Promise.all(promiseArray)
   await user.save()
 
   const userForToken = {

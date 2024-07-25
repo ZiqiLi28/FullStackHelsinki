@@ -60,4 +60,20 @@ blogsRouter.put('/:id', async (request, response) => {
   response.json(updatedBlog)
 })
 
+blogsRouter.delete('/:id', userExtractor, async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  const user = request.user
+
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
+
+  if (blog.user.toString() !== user.id.toString()) {
+    return response.status(401).json({ error: 'only the creator can delete a blog' })
+  }
+
+  await Blog.findByIdAndRemove(request.params.id)
+  response.status(204).end()
+})
+
 module.exports = blogsRouter
